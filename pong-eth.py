@@ -40,7 +40,7 @@ def configure_iface(ifname, ether, ip, netmask = '255.255.255.0', bcast = ''):
 #
 ifname = "eth0"
 print "Allocated interface %s. Configuring it." % ifname
-configure_iface(ifname, '01:02:03:04:05:01', '10.5.0.1')
+configure_iface(ifname, 'f0:02:03:04:05:01', '10.5.0.1')
 
 
 #
@@ -58,14 +58,14 @@ while 1:
     pong[ICMP].type='echo-reply'
     pong[ICMP].chksum = None   # force recalculation
     pong[IP].chksum   = None
-    sendp(pong.build(), iface="eth0")
+    sendp(pong, iface="eth0")
 
   elif packet.haslayer(ARP) and packet[ARP].op == 1 : # ARP who-has
     arp_req = packet;  # don't need to copy, we'll make reply from scratch
 
     # make up a new MAC for every IP address, using the address' last octet 
     s1, s2, s3, s4 = arp_req.pdst.split('.')
-    fake_src_mac = "01:02:03:04:05:" + ("%02x" % int(s4))  
+    fake_src_mac = "f0:02:03:04:05:" + ("%02x" % int(s4))  
 
     # craft an ARP response
     arp_rpl = Ether(dst=arp_req.hwsrc, src=fake_src_mac)/ARP(op="is-at", psrc=arp_req.pdst, pdst="10.5.0.1", hwsrc=fake_src_mac, hwdst=arp_req.hwsrc)
