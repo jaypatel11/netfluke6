@@ -4,6 +4,10 @@
 # Fake Neighbor Discovery and ICMPv6 Echo responses for any address.
 #
 
+#
+#  "Won't you be my neighbor" -- Mr. Rogers (http://www.youtube.com/watch?v=_4nI7AgUKwk)
+#
+
 from scapy.all import *
 
 import os
