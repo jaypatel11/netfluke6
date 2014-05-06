@@ -41,7 +41,7 @@ def configure_iface(ifname, ether, ip, netmask = '255.255.255.0', bcast = ''):
 #
 # Configure interface
 #
-IFNAME = "en0"
+IFNAME = "eth0"
 print "Allocated interface %s. Configuring it." % IFNAME
 configure_iface(IFNAME, 'f2:02:03:04:05:01', '10.5.0.1')
 
@@ -84,7 +84,30 @@ while 1:
 
     print "ND IN: " + packet.summary()
     print "ND OUT: " + reply_na.summary()
-    sendp(reply_na, iface="en0")
+    sendp(reply_na, iface=IFNAME)
+  
+  elif packet.haslayer(ICMPv6ND_RS) and packet[ICMPv6ND_RS].type == 133 : # Router Solication packet
+    rs = packet[ICMPv6ND_RS]
+    
+    #eth packet
+    eth = Ether()
+    eth.dst = packet[Ether].src
+
+    #ip PACKET
+    i6 = IPv6()
+    i6.dst = packet[IPv6].src;
+    
+    
+    #Router Adv packet
+    
+    ra = ICMPv6ND_RA()
+    
+    reply_ra = eth/i6/ra
+
+    print "RS IN: " + packet.summary()
+    print "RA OUT: " + reply_ra.summary()
+    sendp(reply_ra, iface=IFNAME)
+
 
   elif packet.haslayer(ICMPv6EchoRequest):  # send ICMPv6EchoReply
 
@@ -104,7 +127,7 @@ while 1:
 
     print "ECHO IN: " + packet.summary()
     print "ECHO OUT: " + reply_icmpv6.summary()
-    sendp(reply_icmpv6, iface="en0")
+    sendp(reply_icmpv6, iface=IFNAME)
 
   else: # just print the packet. Use "packet.summary()" for one-line summary
     print "Unknown packet: "
